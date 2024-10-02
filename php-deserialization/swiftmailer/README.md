@@ -40,7 +40,7 @@
 
 - Object after `unserialize`
 
-    <p align="center"> <img src="../images/obj1.png"></p>
+    <p align="center"> <img src="/img/php-deserialization/obj1.png"></p>
 
 - Flow when trigger POP chain by triggering `Swift_ByteStream_TemporaryFileByteStream->__destruct()`
 

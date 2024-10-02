@@ -8,7 +8,7 @@
     │   ├── docker-php-ext-xdebug.ini       // xdebug's configuration file for debug PHP
     │   ├── Makefile                        // Quick build, up, down Docker command
     │   └── src                             
-    │       ├── composer.json               // Place which framework/gadgets you want to debug here
+    │       ├── composer.json               // Place where framework/gadgets you want to debug here
     │       └── index.php          
     ├── README.md
     └── swiftmailer                         // Gadgets + PoC + Explainations for POP chain
@@ -39,7 +39,7 @@
     ```
 
 - Open VSCode and use these plugins to connect and debug php inside docker container:
-    - Remote Explorercd
+    - Remote Explorer
     - Dev Containers
     - PHP Debug
-    <p align="center"> <img src="./images/xdebug.png"></p>
+    <p align="center"> <img src="/img/php-deserialization/xdebug.png"></p>
